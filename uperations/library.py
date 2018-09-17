@@ -1,5 +1,5 @@
 
-from kernel.documentable import Documentable
+from .documentable import Documentable
 import inspect
 import os
 

@@ -1,10 +1,10 @@
 from abc import abstractmethod
-from kernel.documentable import Documentable
+from .documentable import Documentable
 import os
 import shutil
 import threading
 import inspect
-from kernel.library import Library
+from .library import Library
 
 
 class OperationException(Exception):

@@ -1,6 +1,5 @@
 
-import kernel
-from kernel.documentable import Documentable
+from .documentable import Documentable
 
 
 class Event(Documentable):
@@ -11,6 +10,6 @@ class Event(Documentable):
         return
 
     def trigger(self):
-        for listener_type in kernel.EVENTS[self.__class__]:
-            listener_type(self).handle()
+        #for listener_type in kernel.EVENTS[self.__class__]:
+        #    listener_type(self).handle()
         return
