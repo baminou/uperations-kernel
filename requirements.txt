@@ -1,2 +1,2 @@
-uperations_base==0.0.1
-kernel==0.0.0
+pytest==3.7.3
+setuptools==40.0.0
