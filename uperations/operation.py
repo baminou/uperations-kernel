@@ -19,7 +19,7 @@ class Operation(Documentable):
     Two methods have to be implemented for childen classes.
     _schema and _run"""
 
-    def __init__(self, library):
+    def __init__(self, library=None):
         self.args = None
         self.output = None
         self.main_thread = None
@@ -135,10 +135,9 @@ class Operation(Documentable):
         Args:
             main_parser: Argparse parser
         """
-        for parent in self.__class__.__bases__:
-            if issubclass(parent, Operation):
-                if not parent.__class__ == Operation.__class__:
-                    parent.parser(main_parser)
+        for cb in self.__class__.__bases__:
+            if issubclass(cb, Operation) and not cb == Operation:
+                cb().parser(main_parser)
         self._parser(main_parser)
         return
 
