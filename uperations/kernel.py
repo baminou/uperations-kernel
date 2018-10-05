@@ -1,5 +1,6 @@
 
 from .library import Library
+from .operation import Operation
 
 class Kernel:
 
@@ -23,22 +24,56 @@ class Kernel:
         else:
             Kernel.__instance = self
         self._libraries = {}
+        self.args = {}
         return
 
     def set_libraries(self, libraries):
+        """
+        Set the libraries
+
+        Params:
+            libraries dict: Dictionary containing libraries with command line name as key and library object as value
+        """
         self._libraries = libraries
+        return
 
     def get_libraries(self):
+        """
+        Return the dictionary of libraries
+
+        Return:
+            dict: Dictionary containing libraries with command line name as key and library object as value
+        """
         return self._libraries
 
+    def set_observers(self, observers_dict):
+        """
+        Add observers to operations in the dictionary
+
+        Params:
+            observers_dict dict: Dictionary containing observers with operation class name as key and list observer class names as value
+        """
+        for library_key in self.get_libraries():
+            operations = self.get_libraries()[library_key].operations()
+            for operation_key in operations:
+                for observer_key in observers_dict:
+                    if isinstance(operations[operation_key],observer_key):
+                        for observer in observers_dict[observer_key]:
+                            operations[operation_key].add_observer(observer())
+        return
+
     def find_operation(self, library, operation):
-        for tmp_lib in self._libraries:
-            if tmp_lib == library:
-                for op in self._libraries()[tmp_lib].operations():
-                    if self._libraries()[tmp_lib].operations()[op].name() == operation:
-                        return self._libraries()[tmp_lib].operations()[op]
-                raise Exception("The operation %s:%s does not exist. " % (library, operation))
-            raise Exception("The libary %s does not exist." % (library))
+        """
+        Find an operation by name
+
+        Args:
+            library (str): Name of the library
+            operation (str): Name of the operation
+
+        Return:
+            Operation: The operation found
+        """
+        return self._libraries[library].find_operation(operation)
 
     def find_library(self, library_name):
         """

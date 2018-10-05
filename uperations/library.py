@@ -6,10 +6,15 @@ from abc import abstractmethod
 
 
 class Library(Documentable):
-
     def __init__(self, slug=None):
         self._slug = slug
+        self._operations = {}
+        self._init_operations()
         return
+
+    @abstractmethod
+    def _init_operations(self):
+        raise NotImplementedError
 
     @abstractmethod
     def operations(self):
@@ -49,3 +54,6 @@ class Library(Documentable):
 
     def operations_dir(self):
         return os.path.join(self.library_dir(),'operations')
+
+    def find_operation(self, operation_name):
+        return self.operations()[operation_name]
