@@ -50,10 +50,13 @@ class Library(Documentable):
         Return:
             str: The path of the library directory in the project
         """
-        return os.path.join(os.path.dirname(inspect.getfile(self.__class__)),self.name())
+        return os.path.dirname(inspect.getfile(self.__class__))
 
     def operations_dir(self):
         return os.path.join(self.library_dir(),'operations')
+
+    def observers_dir(self):
+        return os.path.join(self.library_dir(),'observers')
 
     def find_operation(self, operation_name):
         return self.operations()[operation_name]

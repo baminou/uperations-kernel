@@ -19,7 +19,7 @@ class Operation(Documentable):
     Two methods have to be implemented for childen classes.
     _schema and _run"""
 
-    def __init__(self, library=None, args=None, output=None, unknown_args=None, observers=[]):
+    def __init__(self, library=None, args=None, output=None, unknown_args=None):
         """
         Constructor of the Operation
 
@@ -36,7 +36,7 @@ class Operation(Documentable):
         self.completed = False
         self.unknown_args = unknown_args
         self._library = library
-        self._observers = observers
+        self._observers = []
         return
 
     def set_args(self, args):
