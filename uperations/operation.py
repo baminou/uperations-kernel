@@ -19,13 +19,24 @@ class Operation(Documentable):
     Two methods have to be implemented for childen classes.
     _schema and _run"""
 
-    def __init__(self, library=None):
-        self.args = None
-        self.output = None
+    def __init__(self, library=None, args=None, output=None, unknown_args=None):
+        """
+        Constructor of the Operation
+
+        Params:
+            library Library: The library where the operation is added
+            args: Arguments added, normally from a parser
+            output: The output of the operation
+            unknown_args: Any other arguments provided
+            observers: A list of observers to watch the operation
+        """
+        self.args = args
+        self.output = output
         self.main_thread = None
         self.completed = False
-        self.unknown_args = None
+        self.unknown_args = unknown_args
         self._library = library
+        self._observers = []
         return
 
     def set_args(self, args):
@@ -175,6 +186,8 @@ class Operation(Documentable):
         Return:
             bool: False if the operation cannot be run, True otherwhise
         """
+        for observer in self._observers:
+            observer.before_start(self)
         return self._before_start()
 
     def _before_start(self):
@@ -191,6 +204,8 @@ class Operation(Documentable):
         Return:
             bool: True if everything was done successfully, False otherwise
         """
+        for observer in self._observers:
+            observer.on_completed(self)
         return self._on_completed()
 
     def _on_completed(self):
@@ -210,6 +225,9 @@ class Operation(Documentable):
         """
         if not self.completed:
             threading.Timer(1, self.on_running).start()
+
+        for observer in self._observers:
+            observer.on_running(self)
         return self._on_running()
 
     def _on_running(self):
@@ -227,6 +245,8 @@ class Operation(Documentable):
         Parms:
             exception: The exception raised by the operation
         """
+        for observer in self._observers:
+            observer.on_error(self, exception)
         return self._on_error(exception)
 
     def _on_error(self, exception):
@@ -276,9 +296,6 @@ class Operation(Documentable):
         """
         return os.path.join(self.operation_dir(),"resources")
 
-    def events_dir(self):
-        return os.path.join(self.operation_dir(),"events")
-
     def resource_file(self, filepath):
         """
         Retrieve a resource file
@@ -315,3 +332,19 @@ class Operation(Documentable):
             Library: The associated library
         """
         return self._library
+
+    def add_observer(self, operation_observer):
+        """
+        Add an observer to the operation
+
+        Params:
+            operation_observer OperationObserver: An observer to register
+        """
+        self._observers.append(operation_observer)
+        return
+
+    def get_observers(self):
+        """
+        Return the list of registered observers
+        """
+        return self._observers

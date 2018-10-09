@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
     name='uperations-kernel',
-    version='0.0.5',
+    version='0.0.7',
     packages=find_packages(),
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     long_description=open("README.rst").read(),
