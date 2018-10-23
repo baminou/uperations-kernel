@@ -22,7 +22,7 @@ class Library(Documentable):
         Return a directory containing the list of operations
         :return:
         """
-        raise NotImplementedError
+        return self._operations
 
     def set_slug(self, slug):
         """
@@ -57,6 +57,9 @@ class Library(Documentable):
 
     def observers_dir(self):
         return os.path.join(self.library_dir(),'observers')
+
+    def operation_types_dir(self):
+        return os.path.join(self.library_dir(),'operation_types')
 
     def find_operation(self, operation_name):
         return self.operations()[operation_name]
