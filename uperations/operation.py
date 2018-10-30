@@ -147,7 +147,7 @@ class Operation(Documentable):
             main_parser: Argparse parser
         """
         for cb in self.__class__.__bases__:
-            if issubclass(cb, Operation) and not cb == Operation:
+            if issubclass(cb, Operation):
                 cb().parser(main_parser)
         self._parser(main_parser)
         return
@@ -159,7 +159,7 @@ class Operation(Documentable):
         Args:
             main_parser: Add parser to argparse parser
         """
-        main_parser.add_argument('--TIMER', default=1, help="Interval seconds for on_running method")
+        main_parser.add_argument('--TIMER', default=1, help="Interval seconds for on_running method", type=float)
         return
 
     @staticmethod
@@ -224,7 +224,7 @@ class Operation(Documentable):
             bool: True if the operation should keep running, False otherwise
         """
         if not self.completed:
-            threading.Timer(1, self.on_running).start()
+            threading.Timer(self.args.TIMER, self.on_running).start()
 
         for observer in self._observers:
             observer.on_running(self)
