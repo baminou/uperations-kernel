@@ -224,7 +224,9 @@ class Operation(Documentable):
             bool: True if the operation should keep running, False otherwise
         """
         if not self.completed:
-            threading.Timer(1, self.on_running).start()
+            threading_timer = threading.Timer(1, self.on_running)
+            threading_timer.setDaemon(True)
+            threading_timer.start()
 
         for observer in self._observers:
             observer.on_running(self)
