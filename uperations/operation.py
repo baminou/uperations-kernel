@@ -5,6 +5,7 @@ import shutil
 import threading
 import inspect
 from .library import Library
+import logging
 
 
 class OperationException(Exception):
@@ -37,6 +38,7 @@ class Operation(Documentable):
         self.unknown_args = unknown_args
         self._library = library
         self._observers = []
+        self.logger = None
         return
 
     def set_args(self, args):
@@ -87,6 +89,20 @@ class Operation(Documentable):
         """
         return self.output
 
+    def start_logger(self, logging_level, output_file=None):
+        self.logger = logging.getLogger(self.name())
+        self.logger.setLevel(logging_level)
+
+        ch = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        ch.setFormatter(formatter)
+        self.logger.addHandler(ch)
+
+        if not output_file == None:
+            fh = logging.FileHandler(output_file)
+            fh.setFormatter(formatter)
+            self.logger.addHandler(fh)
+
     @abstractmethod
     def _schema(self):
         """
@@ -119,12 +135,20 @@ class Operation(Documentable):
         """
         self.set_args(args)
         self.set_unknown_args(unknown_args)
+        self.start_logger(self.args.log_level, self.args.log_file)
 
+        self.logger.info("Arguments and logger are set")
+        self.logger.info("Operation is at before starting step")
         run = self.before_start()
         if run:
+            self.logger.info("Operation is now starting")
             self.on_running()
             self.run()
+            self.logger.info("Operation is completing")
             self.on_completed()
+            self.logger.info("Operation is completed")
+        else:
+            self.logger.info("Operation did not start")
         return
 
     def run(self):
@@ -160,6 +184,8 @@ class Operation(Documentable):
             main_parser: Add parser to argparse parser
         """
         main_parser.add_argument('--TIMER', default=1, help="Interval seconds for on_running method", type=float)
+        main_parser.add_argument('--LOG-LEVEL', default='NOTSET', dest='log_level', help="DEBUG, INFO, WARNING, NOTSET")
+        main_parser.add_argument('--LOG', default=None, dest='log_file', help="Log file where to output the log")
         return
 
     @staticmethod
@@ -227,6 +253,7 @@ class Operation(Documentable):
             threading_timer = threading.Timer(self.args.TIMER, self.on_running)
             threading_timer.setDaemon(True)
             threading_timer.start()
+        self.logger.debug(self.__dict__)
 
         for observer in self._observers:
             observer.on_running(self)
@@ -248,7 +275,7 @@ class Operation(Documentable):
             exception: The exception raised by the operation
         """
         for observer in self._observers:
-            observer.on_error(self, exception)
+            observer.on_error(exception, self, exception)
         return self._on_error(exception)
 
     def _on_error(self, exception):
