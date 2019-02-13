@@ -184,7 +184,7 @@ class Operation(Documentable):
         Args:
             main_parser: Add parser to argparse parser
         """
-        main_parser.add_argument('--TIMER', default=1, help="Interval seconds for on_running method", type=float)
+        #main_parser.add_argument('--TIMER', default=1, help="Interval seconds for on_running method", type=float)
         main_parser.add_argument('--LOG-LEVEL', default='NOTSET', dest='log_level', help="DEBUG, INFO, WARNING, NOTSET")
         main_parser.add_argument('--LOG', default=None, dest='log_file', help="Log file where to output the log")
         return
@@ -251,7 +251,7 @@ class Operation(Documentable):
             bool: True if the operation should keep running, False otherwise
         """
         if not self.completed:
-            threading_timer = threading.Timer(self.args.TIMER, self.on_running)
+            threading_timer = threading.Timer(1, self.on_running)
             threading_timer.setDaemon(True)
             threading_timer.start()
         self.logger.debug(self.__dict__)
