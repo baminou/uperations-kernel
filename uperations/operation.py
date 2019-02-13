@@ -161,6 +161,7 @@ class Operation(Documentable):
         except Exception as err:
             self.completed = True
             self.on_error(err)
+            exit(1)
         return
 
     def parser(self, main_parser):
